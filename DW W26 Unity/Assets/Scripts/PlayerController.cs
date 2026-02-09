@@ -1,16 +1,23 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+public enum Team { Red, Blue };
 
 public class PlayerController : MonoBehaviour
 {
     [field: SerializeField] public int PlayerNumber { get; private set; }
     [field: SerializeField] public Color PlayerColor { get; private set; }
+    [field: SerializeField] public Team PlayerTeam { get; private set; }
     [field: SerializeField] public SpriteRenderer SpriteRenderer { get; private set; }
     [field: SerializeField] public Rigidbody2D Rigidbody2D { get; private set; }
-    [field: SerializeField] public float MoveSpeed { get; private set; } = 10f;
-    [field: SerializeField] public float BoostForce { get; private set; } = 5f;
+    [field: SerializeField] public float MoveSpeed { get; private set; } = 150f;
+    [field: SerializeField] public float BoostForce { get; private set; } = 50f;
+    [field: SerializeField] public float BoostAttackTime { get; private set; } = 0.3f;
+    [field: SerializeField] public float BoostCooldown { get; private set; } = 0.7f;
+    [field: SerializeField] public float HitForce { get; private set; } = 70f;
 
-    public bool DoBoost { get; private set; }
+    Transform SpawnPoint;
+    bool DoBoost;
+    float BoostCooldownTimer = 0f;
 
     // Player input information
     private PlayerInput PlayerInput;
@@ -28,6 +35,12 @@ public class PlayerController : MonoBehaviour
             Debug.Log($"Failed to set color to {name} {nameof(PlayerController)}.");
         else
             SpriteRenderer.color = color;
+    }
+
+    // Set Spawn Point
+    public void SetSpawnPoint(PlayerSpawn spawn)
+    {
+        SpawnPoint = spawn.transform;
     }
 
     // Set up player input
@@ -50,12 +63,22 @@ public class PlayerController : MonoBehaviour
     // Runs each frame
     public void Update()
     {
-        // Read the "Boost" action state, which is a boolean value
-        if (InputActionBoost.WasPressedThisFrame())
+        // Update and check boost cooldown timer
+        if (BoostCooldownTimer > 0)
         {
-            // Buffer input becuase I'm controlling the Rigidbody through FixedUpdate
-            // and checking there we can miss inputs.
-            DoBoost = true;
+            BoostCooldownTimer -= Time.deltaTime;
+            if (BoostCooldownTimer < 0)
+                BoostCooldownTimer = 0;
+        }
+        else
+        {
+            // Read the "Boost" action state, which is a boolean value
+            if (InputActionBoost.WasPressedThisFrame())
+            {
+                // Buffer input becuase I'm controlling the Rigidbody through FixedUpdate
+                // and checking there we can miss inputs.
+                DoBoost = true;
+            }
         }
     }
 
@@ -76,12 +99,32 @@ public class PlayerController : MonoBehaviour
         // Apply fraction of force each frame
         Rigidbody2D.AddForce(moveForce, ForceMode2D.Force);
 
-        // JUMP - review Update()
-        if (DoBoost)
+        // BOOST - review Update()
+        if (DoBoost && BoostCooldownTimer == 0)
         {
             // Apply all force immediately
             Rigidbody2D.AddForce(BoostForce*moveValue, ForceMode2D.Impulse);
             DoBoost = false;
+            BoostCooldownTimer = BoostCooldown;
+        }
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        Debug.Log($"{name} collided with {collision.gameObject.name}.");
+        // Check if it's another player and if so, apply some force to them based on our movement direction and boost state.
+        if (collision.gameObject.TryGetComponent<PlayerController>(out PlayerController otherPlayer))
+        {
+            bool inBoostWindow = BoostCooldownTimer > BoostCooldown - BoostAttackTime;
+            // Check if withing boost attack time window
+            if (inBoostWindow)
+            {
+                // Calculate the direction and force to apply
+                Vector2 direction = (otherPlayer.transform.position - transform.position).normalized;
+
+                // Apply the force to the other player's Rigidbody
+                otherPlayer.Rigidbody2D.AddForce(direction * HitForce, ForceMode2D.Impulse);
+            }
         }
     }
 

@@ -43,6 +43,7 @@ public class PlayerSpawn : MonoBehaviour
         playerController.AssignPlayerInputDevice(playerInput);
         playerController.AssignPlayerNumber(PlayerCount);
         playerController.AssignColor(color);
+        playerController.SetSpawnPoint(this);
     }
 
     public void OnPlayerLeft(PlayerInput playerInput)
