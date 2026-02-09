@@ -8,14 +8,14 @@ public class PlayerController : MonoBehaviour
     [field: SerializeField] public SpriteRenderer SpriteRenderer { get; private set; }
     [field: SerializeField] public Rigidbody2D Rigidbody2D { get; private set; }
     [field: SerializeField] public float MoveSpeed { get; private set; } = 10f;
-    [field: SerializeField] public float JumpForce { get; private set; } = 5f;
+    [field: SerializeField] public float BoostForce { get; private set; } = 5f;
 
-    public bool DoJump { get; private set; }
+    public bool DoBoost { get; private set; }
 
     // Player input information
     private PlayerInput PlayerInput;
     private InputAction InputActionMove;
-    private InputAction InputActionJump;
+    private InputAction InputActionBoost;
 
     // Assign color value on spawn from main spawner
     public void AssignColor(Color color)
@@ -38,7 +38,7 @@ public class PlayerController : MonoBehaviour
         // Find the references to the "Move" and "Jump" actions inside the player input's action map
         // Here I specify "Player/" but it in not required if assigning the action map in PlayerInput inspector.
         InputActionMove = playerInput.actions.FindAction($"Player/Move");
-        InputActionJump = playerInput.actions.FindAction($"Player/Jump");
+        InputActionBoost = playerInput.actions.FindAction($"Player/Jump");
     }
 
     // Assign player number on spawn
@@ -50,12 +50,12 @@ public class PlayerController : MonoBehaviour
     // Runs each frame
     public void Update()
     {
-        // Read the "Jump" action state, which is a boolean value
-        if (InputActionJump.WasPressedThisFrame())
+        // Read the "Boost" action state, which is a boolean value
+        if (InputActionBoost.WasPressedThisFrame())
         {
             // Buffer input becuase I'm controlling the Rigidbody through FixedUpdate
             // and checking there we can miss inputs.
-            DoJump = true;
+            DoBoost = true;
         }
     }
 
@@ -71,17 +71,17 @@ public class PlayerController : MonoBehaviour
         // MOVE
         // Read the "Move" action value, which is a 2D vector
         Vector2 moveValue = InputActionMove.ReadValue<Vector2>();
-        // Here we're only using the X axis to move.
-        float moveForce = moveValue.x * MoveSpeed;
+
+        Vector2 moveForce = moveValue * MoveSpeed;
         // Apply fraction of force each frame
-        Rigidbody2D.AddForceX(moveForce, ForceMode2D.Force);
+        Rigidbody2D.AddForce(moveForce, ForceMode2D.Force);
 
         // JUMP - review Update()
-        if (DoJump)
+        if (DoBoost)
         {
             // Apply all force immediately
-            Rigidbody2D.AddForceY(JumpForce, ForceMode2D.Impulse);
-            DoJump = false;
+            Rigidbody2D.AddForce(BoostForce*moveValue, ForceMode2D.Impulse);
+            DoBoost = false;
         }
     }
 
