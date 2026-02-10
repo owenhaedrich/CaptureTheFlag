@@ -7,24 +7,72 @@ public class Flag : MonoBehaviour
 
     [field: SerializeField] GameManager GameManager;
 
+    Vector2 homePosition;
+
     bool held;
     PlayerController heldByPlayer;
     float heldSpeed = 5f;
+
     float dropReturnTime;
     float dropReturnTimer;
 
+    float homeReturnSpeed = 50f;
+    float homeReturnDistanceFactor = 2f;
+    bool returningHome;
+
+    private void Start()
+    {
+        homePosition = transform.position;
+    }
+
+    private void ResetFlag()
+    {
+        returningHome = true;
+        held = false;
+        heldByPlayer = null;
+        dropReturnTimer = 0;
+    }
+
     private void FixedUpdate()
     {
-        if (held)
+        if (returningHome)
+        {
+            Vector2 moveTowardsHome = homePosition - (Vector2)transform.position;
+            if (moveTowardsHome.magnitude < 0.01f)
+            {
+                transform.position = (Vector3)homePosition;
+                returningHome = false;
+            }
+            else
+            {
+                float distanceFactor = (moveTowardsHome.magnitude / 50f) * homeReturnDistanceFactor;
+                transform.position += (Vector3)moveTowardsHome.normalized * homeReturnSpeed * distanceFactor * Time.fixedDeltaTime;
+            }
+        }
+        else if (held)
         {
             Vector2 moveTowardsDirection = heldByPlayer.transform.position - transform.position;
             float distanceFactor = (moveTowardsDirection.magnitude / 50f) * MagnetToPlayer;
             transform.position += (Vector3)moveTowardsDirection.normalized * heldSpeed * Time.fixedDeltaTime * distanceFactor;
         }
+        else if (transform.position != (Vector3)homePosition)
+        {
+            dropReturnTimer += Time.fixedDeltaTime;
+            if (dropReturnTimer >= dropReturnTime)
+            {
+                ResetFlag();
+                dropReturnTimer = 0;
+            }
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
+        // Don't do anything if the flag is returning home.
+        if (returningHome)
+            return;
+
+        // Check if it's a player and if so, pick up the flag if on the opposite team.
         Debug.Log($"Flag {name} collided with {other.name}.");  
         if (other.TryGetComponent(out PlayerController playerController))
         {
@@ -39,7 +87,10 @@ public class Flag : MonoBehaviour
         if (other.TryGetComponent(out Goal goal))
         {
             if (goal.Team != Team)
+            {
                 GameManager.ScoreGoal(goal.Team);
+                ResetFlag();
+            }
         }
     }
 }
