@@ -20,6 +20,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float RespawnDelay = 0.75f;
     [SerializeField] float MidlineX = 0f;
 
+    public Flag CarriedFlag { get; private set; }
+
     Transform SpawnPoint;
     bool DoBoost;
     float BoostCooldownTimer = 0f;
@@ -30,8 +32,6 @@ public class PlayerController : MonoBehaviour
 
     Collider2D PlayerCollider;
     bool IsDead = false;
-
-    Flag CarriedFlag;
 
     private void Awake()
     {
