@@ -31,10 +31,14 @@ public class PlayerSpawn : MonoBehaviour
 
         PlayerCount++;
 
+        // Assign team based on player count (even = Blue, odd = Red)
+        Team team = (PlayerCount % 2 == 1) ? Team.Red : Team.Blue;
+
         PlayerController playerController = playerInput.GetComponent<PlayerController>();
         playerController.AssignPlayerInputDevice(playerInput);
         playerController.AssignPlayerNumber(PlayerCount);
         playerController.AssignColor(color);
+        playerController.AssignTeam(team);
         playerController.SetSpawnPoint(spawnPoint);
     }
 

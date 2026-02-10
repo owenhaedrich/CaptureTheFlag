@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections;
 
 public enum Team { Red, Blue };
 
@@ -43,6 +44,11 @@ public class PlayerController : MonoBehaviour
     {
         PlayerColor = color;
         if (SpriteRenderer != null) SpriteRenderer.color = color;
+    }
+
+    public void AssignTeam(Team team)
+    {
+        PlayerTeam = team;
     }
 
     public void SetSpawnPoint(Transform spawnPoint)
@@ -102,7 +108,8 @@ public class PlayerController : MonoBehaviour
         StartCoroutine(RespawnRoutine());
     }
 
-    System.Collections.IEnumerator RespawnRoutine()
+    // Respawn after delay
+    IEnumerator RespawnRoutine()
     {
         yield return new WaitForSeconds(RespawnDelay);
         Respawn();
@@ -156,7 +163,7 @@ public class PlayerController : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (!collision.gameObject.TryGetComponent<PlayerController>(out PlayerController otherPlayer)) return;
+        if (!collision.gameObject.TryGetComponent(out PlayerController otherPlayer)) return;
 
         bool inBoostWindow = BoostCooldownTimer > BoostCooldown - BoostAttackTime;
         if (!inBoostWindow) return;
@@ -165,10 +172,13 @@ public class PlayerController : MonoBehaviour
         if (otherPlayer.Rigidbody2D != null)
             otherPlayer.Rigidbody2D.AddForce(direction * HitForce, ForceMode2D.Impulse);
 
-        if (otherPlayer.IsInEnemyEnd())
+        // Kill an enemy player if they are in our end or carrying a flag
+        if (otherPlayer.IsInEnemyEnd() || otherPlayer.CarriedFlag != null)
             otherPlayer.Die();
     }
 
+
+    // For adding and removing players from the game
     private void OnValidate()
     {
         Reset();
