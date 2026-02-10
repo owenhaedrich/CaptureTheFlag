@@ -13,7 +13,7 @@ public class Flag : MonoBehaviour
     PlayerController heldByPlayer;
     float heldSpeed = 5f;
 
-    float dropReturnTime;
+    [SerializeField] float dropReturnTime = 6f;
     float dropReturnTimer;
 
     float homeReturnSpeed = 50f;
@@ -25,9 +25,25 @@ public class Flag : MonoBehaviour
         homePosition = transform.position;
     }
 
+    public void Drop()
+    {
+        if (!held) return;
+
+        if (heldByPlayer != null)
+            heldByPlayer.ClearCarriedFlag(this);
+
+        held = false;
+        heldByPlayer = null;
+        dropReturnTimer = 0f;
+    }
+
     private void ResetFlag()
     {
         returningHome = true;
+
+        if (heldByPlayer != null)
+            heldByPlayer.ClearCarriedFlag(this);
+
         held = false;
         heldByPlayer = null;
         dropReturnTimer = 0;
@@ -68,22 +84,19 @@ public class Flag : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        // Don't do anything if the flag is returning home.
         if (returningHome)
             return;
 
-        // Check if it's a player and if so, pick up the flag if on the opposite team.
-        Debug.Log($"Flag {name} collided with {other.name}.");  
         if (other.TryGetComponent(out PlayerController playerController))
         {
             if (playerController.PlayerTeam != Team && !held)
             {
                 heldByPlayer = playerController;
                 held = true;
+                heldByPlayer.SetCarriedFlag(this);
             }
         }
 
-        // Check if it's a goal and if so, score if held by the correct team.
         if (other.TryGetComponent(out Goal goal))
         {
             if (goal.Team != Team)
