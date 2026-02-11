@@ -78,6 +78,11 @@ public class PlayerController : MonoBehaviour
         if (CarriedFlag == flag) CarriedFlag = null;
     }
 
+    public bool PressedBoostThisFrame()
+    {
+        return InputActionBoost != null && InputActionBoost.WasPressedThisFrame();
+    }
+
     public bool IsInEnemyEnd()
     {
         if (PlayerTeam == Team.Red) return transform.position.x > MidlineX;
@@ -108,7 +113,6 @@ public class PlayerController : MonoBehaviour
         StartCoroutine(RespawnRoutine());
     }
 
-    // Respawn after delay
     IEnumerator RespawnRoutine()
     {
         yield return new WaitForSeconds(RespawnDelay);
@@ -172,13 +176,10 @@ public class PlayerController : MonoBehaviour
         if (otherPlayer.Rigidbody2D != null)
             otherPlayer.Rigidbody2D.AddForce(direction * HitForce, ForceMode2D.Impulse);
 
-        // Kill an enemy player if they are in our end or carrying a flag
         if (otherPlayer.IsInEnemyEnd() || otherPlayer.CarriedFlag != null)
             otherPlayer.Die();
     }
 
-
-    // For adding and removing players from the game
     private void OnValidate()
     {
         Reset();
