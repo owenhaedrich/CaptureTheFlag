@@ -21,6 +21,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float MidlineX = 0f;
 
     public Flag CarriedFlag { get; private set; }
+    public Collider2D PlayerCollider { get; private set; }
 
     Transform SpawnPoint;
     bool DoBoost;
@@ -30,7 +31,6 @@ public class PlayerController : MonoBehaviour
     InputAction InputActionMove;
     InputAction InputActionBoost;
 
-    Collider2D PlayerCollider;
     bool IsDead = false;
 
     private void Awake()

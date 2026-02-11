@@ -1298,7 +1298,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 0.95, y: 1}
   m_EdgeRadius: 0
 --- !u!114 &385059944
 MonoBehaviour:
@@ -1312,8 +1312,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f57282afee0859640ae5199b7005aa6a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  offScreenIndicatorRed: {fileID: 0}
-  offScreenIndicatorBlue: {fileID: 0}
+  offScreenIndicator: {fileID: 8973487341271254027, guid: 97ee6fa655605a14fa27aeb8ada560c0, type: 3}
 --- !u!1001 &476416365
 PrefabInstance:
   m_ObjectHideFlags: 0

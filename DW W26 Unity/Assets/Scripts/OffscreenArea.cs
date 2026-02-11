@@ -2,25 +2,35 @@ using UnityEngine;
 
 public class OffscreenArea : MonoBehaviour
 {
-    [SerializeField] SpriteRenderer offScreenIndicatorRed;
-    [SerializeField] SpriteRenderer offScreenIndicatorBlue;
+    [SerializeField] GameObject offScreenIndicator;
 
-    // Shows the vertical position of the player on the off-screen indicator when they are off-screen.
-    // Displayed along the edge, red indicators on the left, blue indicators on the right.
-    private void OnTriggerStay2D(Collider2D collision)
+    Collider2D offscreenArea;
+
+    float offset = 0.5f; // Multiplier to determine how far off-screen the indicator should be placed.
+
+    private void Awake()
+    {
+        offscreenArea = GetComponent<Collider2D>();
+        if (offscreenArea == null)
+        {
+            Debug.LogError("OffscreenArea requires a Collider2D component.");
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.TryGetComponent<PlayerController>(out var player))
         {
-            // Get the player's position relative to the off-screen area
-            Vector3 playerPosition = player.transform.position;
-            float offScreenAreaHeight = transform.localScale.y;
+            // Create an off-screen indicator for the player if they don't already have one.
+            // Spawn at the edge the player is exiting from, with an offset to ensure it's fully off-screen.
+            Vector2 indicatorSpawnPosition = new Vector2(transform.position.x + (transform.localScale.x / 2 + offset) * Mathf.Sign(player.transform.position.x - transform.position.x), player.transform.position.y);
 
-            // Calculate the normalized position (0 to 1) based on the off-screen area's height
-            float normalizedPosition = Mathf.InverseLerp(-offScreenAreaHeight / 2, offScreenAreaHeight / 2, playerPosition.y);
-
-            // Update the off-screen indicators' positions
-            offScreenIndicatorRed.transform.localPosition = new Vector3(-0.5f, normalizedPosition, 0);
-            offScreenIndicatorBlue.transform.localPosition = new Vector3(0.5f, normalizedPosition, 0);
+            // Tint the off-screen indicator with the player's color.
+            offScreenIndicator.GetComponent<SpriteRenderer>().color = player.PlayerColor;
+            offScreenIndicator.GetComponent<SpriteRenderer>().flipX = Mathf.Sign(player.transform.position.x - transform.position.x) < 0;
+            offScreenIndicator.GetComponent<OffscreenIndicator>().player = player;
+            offScreenIndicator.GetComponent<OffscreenIndicator>().offscreenArea = offscreenArea;
+            Instantiate(offScreenIndicator, indicatorSpawnPosition, Quaternion.identity);
         }
     }
 }
