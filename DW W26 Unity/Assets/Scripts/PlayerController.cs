@@ -28,7 +28,6 @@ public class PlayerController : MonoBehaviour
     public Collider2D PlayerCollider { get; private set; }
     public bool inBoostWindow = false;
 
-
     Transform SpawnPoint;
     bool DoBoost;
     float BoostCooldownTimer = 0f;

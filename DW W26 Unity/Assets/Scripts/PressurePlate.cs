@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class PressurePlate : MonoBehaviour
 {
-    [SerializeField] Activatable connectedActivatable;
+    [SerializeField] Activatable[] connectedActivatables;
 
     bool occupied = false;
 
@@ -14,17 +14,12 @@ public class PressurePlate : MonoBehaviour
             {
                 occupied = true;
                 if (SoundManager.Instance != null) SoundManager.Instance.PlayStepOn();
+                
+                foreach (var activatable in connectedActivatables)
+                {
+                    if (activatable != null) activatable.Activate();
+                }
             }
-
-            connectedActivatable.Activate();
-        }
-    }
-
-    private void OnTriggerStay2D(Collider2D collision)
-    {
-        if (collision.gameObject.TryGetComponent(out PlayerController player) && connectedActivatable.holdable)
-        {
-            connectedActivatable.Activate();
         }
     }
 
@@ -36,6 +31,11 @@ public class PressurePlate : MonoBehaviour
             {
                 occupied = false;
                 if (SoundManager.Instance != null) SoundManager.Instance.PlayStepOff();
+
+                foreach (var activatable in connectedActivatables)
+                {
+                    if (activatable != null) activatable.Deactivate();
+                }
             }
         }
     }

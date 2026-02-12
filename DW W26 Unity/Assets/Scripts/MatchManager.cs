@@ -4,9 +4,13 @@ using TMPro;
 
 public class MatchManager : MonoBehaviour
 {
-    [SerializeField] TMP_Text CountdownText;
-    [SerializeField] TMP_Text TimerText;
-    [SerializeField] GameObject MenuOverlay;
+    [SerializeField] TMP_Text RedCountdownText;
+    [SerializeField] TMP_Text RedTimerText;
+    [SerializeField] GameObject RedMenuOverlay;
+
+    [SerializeField] TMP_Text BlueCountdownText;
+    [SerializeField] TMP_Text BlueTimerText;
+    [SerializeField] GameObject BlueMenuOverlay;
 
     [SerializeField] float StartCountdownSeconds = 3f;
     [SerializeField] float MatchSeconds = 60f;
@@ -19,7 +23,14 @@ public class MatchManager : MonoBehaviour
     {
         timeLeft = MatchSeconds;
 
-        if (MenuOverlay != null) MenuOverlay.SetActive(true);
+        if (RedMenuOverlay != null)
+        {
+            RedMenuOverlay.SetActive(true);
+        }
+        if (BlueMenuOverlay != null)
+        {
+            BlueMenuOverlay.SetActive(true);
+        }
 
         Time.timeScale = 0f;
         matchRunning = false;
@@ -33,7 +44,14 @@ public class MatchManager : MonoBehaviour
             if (AnyPlayerPressedStart())
             {
                 waitingInMenu = false;
-                if (MenuOverlay != null) MenuOverlay.SetActive(false);
+                if (RedMenuOverlay != null)
+                {
+                    RedMenuOverlay.SetActive(false);
+                }
+                if (BlueMenuOverlay != null)
+                {
+                    BlueMenuOverlay.SetActive(false);
+                }
                 StartCoroutine(StartCountdown());
             }
             return;
@@ -44,10 +62,15 @@ public class MatchManager : MonoBehaviour
         timeLeft -= Time.deltaTime;
         if (timeLeft < 0f) timeLeft = 0f;
 
-        if (TimerText != null)
+        if (RedTimerText != null)
         {
             int seconds = Mathf.CeilToInt(timeLeft);
-            TimerText.text = seconds.ToString();
+            RedTimerText.text = seconds.ToString();
+        }
+        if (BlueTimerText != null)
+        {
+            int seconds = Mathf.CeilToInt(timeLeft);
+            BlueTimerText.text = seconds.ToString();
         }
 
         if (timeLeft <= 0f)
@@ -79,24 +102,29 @@ public class MatchManager : MonoBehaviour
     float t = StartCountdownSeconds;
     while (t > 0f)
     {
-        if (CountdownText != null) CountdownText.text = Mathf.CeilToInt(t).ToString();
+        if (RedCountdownText != null) RedCountdownText.text = Mathf.CeilToInt(t).ToString();
+        if (BlueCountdownText != null) BlueCountdownText.text = Mathf.CeilToInt(t).ToString();
         yield return new WaitForSecondsRealtime(1f);
         t -= 1f;
     }
 
-    if (CountdownText != null) CountdownText.text = "GO!";
+    if (RedCountdownText != null) RedCountdownText.text = "GO!";
+    if (BlueCountdownText != null) BlueCountdownText.text = "GO!";
 
-    Time.timeScale = 1f;
+
+        Time.timeScale = 1f;
     matchRunning = true;
 
     yield return new WaitForSeconds(1f);
-    if (CountdownText != null) CountdownText.text = "";
+    if (RedCountdownText != null) RedCountdownText.text = "";
+    if (BlueCountdownText != null) BlueCountdownText.text = "";
     }
 
     System.Collections.IEnumerator RestartRoutine()
     {
         Time.timeScale = 0f;
-        if (CountdownText != null) CountdownText.text = "TIME!";
+        if (RedCountdownText != null) RedCountdownText.text = "TIME!";
+        if (BlueCountdownText != null) BlueCountdownText.text = "TIME!";
 
         yield return new WaitForSecondsRealtime(15f);
 
