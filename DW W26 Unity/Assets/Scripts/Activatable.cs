@@ -25,6 +25,17 @@ public class Activatable : MonoBehaviour
                 activeTimer = 0f;
             }
         }
+
+
+        SpriteRenderer sr = GetComponent<SpriteRenderer>();
+        if (active)
+        {
+            sr.enabled = true;
+        }
+        else
+        {
+            sr.enabled = false;
+        }
     }
 
     public void Activate()
