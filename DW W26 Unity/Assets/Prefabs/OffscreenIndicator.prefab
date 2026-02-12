@@ -101,3 +101,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 0}
+  offscreenArea: {fileID: 0}

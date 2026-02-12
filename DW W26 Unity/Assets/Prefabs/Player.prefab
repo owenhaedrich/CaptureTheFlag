@@ -209,7 +209,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f140c3d8802fae1458d9b5a898830e3b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <PlayerNumber>k__BackingField: 1
+  <PlayerNumber>k__BackingField: 2
   <PlayerColor>k__BackingField: {r: 1, g: 0, b: 0, a: 1}
   <PlayerTeam>k__BackingField: 0
   <SpriteRenderer>k__BackingField: {fileID: 2500016798255280548}
@@ -219,6 +219,8 @@ MonoBehaviour:
   <BoostAttackTime>k__BackingField: 0.3
   <BoostCooldown>k__BackingField: 0.7
   <HitForce>k__BackingField: 70
+  RespawnDelay: 0.75
+  MidlineX: 0
 --- !u!50 &3752404572598628836
 Rigidbody2D:
   serializedVersion: 5

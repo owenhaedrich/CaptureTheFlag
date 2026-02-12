@@ -94,6 +94,9 @@ public class Flag : MonoBehaviour
                 heldByPlayer = playerController;
                 held = true;
                 heldByPlayer.SetCarriedFlag(this);
+
+                if (SoundManager.Instance != null)
+                    SoundManager.Instance.PlayFlagSnatched();
             }
         }
 
@@ -101,6 +104,9 @@ public class Flag : MonoBehaviour
         {
             if (goal.Team != Team)
             {
+                if (SoundManager.Instance != null)
+                    SoundManager.Instance.PlayFlagCaptured();
+
                 GameManager.ScoreGoal(goal.Team);
                 ResetFlag();
             }

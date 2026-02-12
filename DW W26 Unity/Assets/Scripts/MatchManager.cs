@@ -70,23 +70,27 @@ public class MatchManager : MonoBehaviour
 
     System.Collections.IEnumerator StartCountdown()
     {
-        matchRunning = false;
-        Time.timeScale = 0f;
+    matchRunning = false;
+    Time.timeScale = 0f;
 
-        float t = StartCountdownSeconds;
-        while (t > 0f)
-        {
-            if (CountdownText != null) CountdownText.text = Mathf.CeilToInt(t).ToString();
-            yield return new WaitForSecondsRealtime(1f);
-            t -= 1f;
-        }
+    if (SoundManager.Instance != null)
+        SoundManager.Instance.PlayRoundStart();
 
-        if (CountdownText != null) CountdownText.text = "GO!";
-        Time.timeScale = 1f;
-        matchRunning = true;
+    float t = StartCountdownSeconds;
+    while (t > 0f)
+    {
+        if (CountdownText != null) CountdownText.text = Mathf.CeilToInt(t).ToString();
+        yield return new WaitForSecondsRealtime(1f);
+        t -= 1f;
+    }
 
-        yield return new WaitForSeconds(1f);
-        if (CountdownText != null) CountdownText.text = "";
+    if (CountdownText != null) CountdownText.text = "GO!";
+
+    Time.timeScale = 1f;
+    matchRunning = true;
+
+    yield return new WaitForSeconds(1f);
+    if (CountdownText != null) CountdownText.text = "";
     }
 
     System.Collections.IEnumerator RestartRoutine()

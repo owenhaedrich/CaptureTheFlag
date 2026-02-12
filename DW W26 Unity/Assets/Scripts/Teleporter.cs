@@ -1,7 +1,7 @@
 using UnityEngine;
 
 public class Teleporter : Activatable
-{    
+{
     [SerializeField] Teleporter destinationTeleporter;
     [SerializeField] float TeleportCooldown = 0.5f;
 
@@ -12,6 +12,7 @@ public class Teleporter : Activatable
     {
         if (teleporterCollider == null) teleporterCollider = GetComponent<Collider2D>();
     }
+
     private void Update()
     {
         if (cooldownTimer > 0f)
@@ -37,6 +38,8 @@ public class Teleporter : Activatable
 
     void TeleportPlayers()
     {
+        bool teleportedSomeone = false;
+
         foreach (Collider2D collider in Physics2D.OverlapBoxAll(teleporterCollider.bounds.center, teleporterCollider.bounds.size, 0f))
         {
             if (collider.gameObject.TryGetComponent(out PlayerController playerController))
@@ -45,16 +48,21 @@ public class Teleporter : Activatable
                 {
                     destinationTeleporter.StartCooldown();
                     playerController.transform.position = destinationTeleporter.transform.position;
+
                     if (playerController.CarriedFlag != null)
                     {
                         playerController.CarriedFlag.transform.position = destinationTeleporter.transform.position;
                     }
+
+                    teleportedSomeone = true;
                 }
             }
         }
+
+        if (teleportedSomeone && SoundManager.Instance != null)
+            SoundManager.Instance.PlayTeleporter();
     }
 
-    // Prevent teleporting again immediately after teleporting
     void StartCooldown()
     {
         cooldownTimer = TeleportCooldown;

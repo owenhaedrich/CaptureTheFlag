@@ -160,6 +160,10 @@ public class PlayerController : MonoBehaviour
         if (DoBoost && BoostCooldownTimer == 0)
         {
             Rigidbody2D.AddForce(BoostForce * moveValue, ForceMode2D.Impulse);
+
+            if (SoundManager.Instance != null)
+                SoundManager.Instance.PlayDash();
+
             DoBoost = false;
             BoostCooldownTimer = BoostCooldown;
         }
@@ -177,7 +181,12 @@ public class PlayerController : MonoBehaviour
             otherPlayer.Rigidbody2D.AddForce(direction * HitForce, ForceMode2D.Impulse);
 
         if (otherPlayer.IsInEnemyEnd() || otherPlayer.CarriedFlag != null)
+        {
+            if (SoundManager.Instance != null)
+                SoundManager.Instance.PlayDashKill();
+
             otherPlayer.Die();
+        }
     }
 
     private void OnValidate()
