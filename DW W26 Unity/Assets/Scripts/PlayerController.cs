@@ -16,12 +16,18 @@ public class PlayerController : MonoBehaviour
     [field: SerializeField] public float BoostAttackTime { get; private set; } = 0.3f;
     [field: SerializeField] public float BoostCooldown { get; private set; } = 0.7f;
     [field: SerializeField] public float HitForce { get; private set; } = 70f;
+    [field: SerializeField] public float SideStepBoost { get; private set; } = 20f;
+    [field: SerializeField] public float KickStartBoost { get; private set; } = 20f;
+    [field: SerializeField] public float MaxSpeed { get; private set; } = 10f;
+
 
     [SerializeField] float RespawnDelay = 0.75f;
     [SerializeField] float MidlineX = 0f;
 
     public Flag CarriedFlag { get; private set; }
     public Collider2D PlayerCollider { get; private set; }
+    public bool inBoostWindow = false;
+
 
     Transform SpawnPoint;
     bool DoBoost;
@@ -157,36 +163,38 @@ public class PlayerController : MonoBehaviour
         Vector2 moveValue = InputActionMove.ReadValue<Vector2>();
         Rigidbody2D.AddForce(moveValue * MoveSpeed, ForceMode2D.Force);
 
+        // Add a small boost when starting to move from a stop
+        bool isStartingToMove = Rigidbody2D.linearVelocity.magnitude < 3f && moveValue.magnitude > 0.1f;
+        if (isStartingToMove)
+        {
+            Rigidbody2D.AddForce(moveValue * KickStartBoost, ForceMode2D.Impulse);
+        }
+
+        // Apply boost if requested and not on cooldown
         if (DoBoost && BoostCooldownTimer == 0)
         {
             Rigidbody2D.AddForce(BoostForce * moveValue, ForceMode2D.Impulse);
-
-            if (SoundManager.Instance != null)
-                SoundManager.Instance.PlayDash();
-
             DoBoost = false;
             BoostCooldownTimer = BoostCooldown;
         }
+
+        // Check if we are in the boost attack window (after boosting but before cooldown finishes)
+        inBoostWindow = BoostCooldownTimer > BoostCooldown - BoostAttackTime;
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (!collision.gameObject.TryGetComponent(out PlayerController otherPlayer)) return;
 
-        bool inBoostWindow = BoostCooldownTimer > BoostCooldown - BoostAttackTime;
         if (!inBoostWindow) return;
 
         Vector2 direction = (otherPlayer.transform.position - transform.position).normalized;
         if (otherPlayer.Rigidbody2D != null)
             otherPlayer.Rigidbody2D.AddForce(direction * HitForce, ForceMode2D.Impulse);
 
-        if (otherPlayer.IsInEnemyEnd() || otherPlayer.CarriedFlag != null)
-        {
-            if (SoundManager.Instance != null)
-                SoundManager.Instance.PlayDashKill();
-
+        // Kill the other player if they are in the enemy end or carrying a flag, AND they are not boosting themselves (boosts trade)
+        if ((otherPlayer.IsInEnemyEnd() || otherPlayer.CarriedFlag != null) && !otherPlayer.inBoostWindow)
             otherPlayer.Die();
-        }
     }
 
     private void OnValidate()
