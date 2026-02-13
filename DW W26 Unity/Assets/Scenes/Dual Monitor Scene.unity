@@ -7275,9 +7275,11 @@ MonoBehaviour:
   RoundStart: {fileID: 8300000, guid: 50a73d845d9ce864b9def5c4bd5a1cda, type: 3}
   FlagSnatched: {fileID: 8300000, guid: b88e056e48a13234bb0a06152c8abf9b, type: 3}
   FlagCaptured: {fileID: 8300000, guid: 17c9b61d7c0706c4892e78e380f4e65d, type: 3}
-  DashKill: {fileID: 8300000, guid: 49b7af97b1803a24b9d222a61a289b6a, type: 3}
-  Teleporter: {fileID: 8300000, guid: d1de6eadf78b0404bbd8a37e2ef7e3fe, type: 3}
+  FlagDropped: {fileID: 8300000, guid: 96160b87ee2a1ad47b973834f7306579, type: 3}
   Dash: {fileID: 8300000, guid: ea1f8fac6dbde684cbab657453e55b54, type: 3}
+  DashKill: {fileID: 8300000, guid: 49b7af97b1803a24b9d222a61a289b6a, type: 3}
+  Respawn: {fileID: 8300000, guid: 190e39f42c0e88647983fbdcc7e6f21f, type: 3}
+  Teleporter: {fileID: 8300000, guid: d1de6eadf78b0404bbd8a37e2ef7e3fe, type: 3}
   StepOn: {fileID: 8300000, guid: be165ef607f68934287d17ceae5b5248, type: 3}
   StepOff: {fileID: 8300000, guid: fff7da93ce003d24d826b5702cbfc72b, type: 3}
 --- !u!82 &2004708605

@@ -29,6 +29,9 @@ public class Flag : MonoBehaviour
     {
         if (!held) return;
 
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.PlayFlagDropped();
+
         if (heldByPlayer != null)
             heldByPlayer.ClearCarriedFlag(this);
 
