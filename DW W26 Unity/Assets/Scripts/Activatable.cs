@@ -5,16 +5,27 @@ public class Activatable : MonoBehaviour
     [SerializeField] float activeTime = 0.1f; // Time to stay active after being activated
     [SerializeField] public bool holdable = true;
     [SerializeField] public bool alwaysOn = false;
-    [SerializeField] bool hideWhenInactive = true;
+    [SerializeField] bool hideWhenInactive = false;
     [SerializeField] bool inverted = false;
+
+    [Header("Sprite Settings")]
+    [SerializeField] Sprite activeSprite;
+    [SerializeField] Sprite inactiveSprite;
+
+    [Header("Color Settings")]
+    [SerializeField] Color activeColor = Color.white;
+    [SerializeField] Color inactiveColor = Color.white;
 
     public bool active { get; private set; } = false;
     float activeTimer = 0f; // Timer to track how long the object has been active
     private int currentTriggers = 0;
+    private SpriteRenderer spriteRenderer;
 
     protected virtual void Start()
     {
+        spriteRenderer = GetComponent<SpriteRenderer>();
         UpdateState();
+        UpdateAppearance();
     }
 
     public void UpdateActivationTimer()
@@ -39,14 +50,7 @@ public class Activatable : MonoBehaviour
              UpdateState();
         }
 
-        if (hideWhenInactive)
-        {
-            SpriteRenderer sr = GetComponent<SpriteRenderer>();
-            if (sr != null)
-            {
-                sr.enabled = active;
-            }
-        }
+        UpdateAppearance();
     }
 
     public void Activate()
@@ -71,11 +75,8 @@ public class Activatable : MonoBehaviour
             activeTimer = activeTime;
             ActivationEffect();
         }
-        else if (!shouldBeActive && active)
-        {
-            active = false;
-            DeactivationEffect();
-        }
+
+        UpdateAppearance();
     }
 
     private bool ShouldBeActiveAccordingToTriggers()
@@ -89,6 +90,29 @@ public class Activatable : MonoBehaviour
         active = newState;
         if (active) ActivationEffect();
         else DeactivationEffect();
+
+        UpdateAppearance();
+    }
+
+    private void UpdateAppearance()
+    {
+        if (spriteRenderer == null) return;
+
+        if (active)
+        {
+            if (activeSprite != null) spriteRenderer.sprite = activeSprite;
+            spriteRenderer.color = activeColor;
+        }
+        else
+        {
+            if (inactiveSprite != null) spriteRenderer.sprite = inactiveSprite;
+            spriteRenderer.color = inactiveColor;
+        }
+
+        if (hideWhenInactive)
+        {
+            spriteRenderer.enabled = active;
+        }
     }
 
     //Override this method with effects that should happen when the object is activated.

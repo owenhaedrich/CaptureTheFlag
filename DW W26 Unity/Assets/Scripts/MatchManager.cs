@@ -12,6 +12,11 @@ public class MatchManager : MonoBehaviour
     [SerializeField] TMP_Text BlueTimerText;
     [SerializeField] GameObject BlueMenuOverlay;
 
+    [Space(10)]
+    [SerializeField] GameObject RedWinOverlay;
+    [SerializeField] GameObject BlueWinOverlay;
+    [SerializeField] GameManager gameManager;
+
     [SerializeField] float StartCountdownSeconds = 3f;
     [SerializeField] float MatchSeconds = 60f;
 
@@ -32,9 +37,21 @@ public class MatchManager : MonoBehaviour
             BlueMenuOverlay.SetActive(true);
         }
 
+        if (RedWinOverlay != null)
+        {
+            RedWinOverlay.SetActive(false);
+        }
+        if (BlueWinOverlay != null)
+        {
+            BlueWinOverlay.SetActive(false);
+        }
+
         Time.timeScale = 0f;
         matchRunning = false;
         waitingInMenu = true;
+
+        if (BackgroundMusic.Instance != null)
+            BackgroundMusic.Instance.PlayMenu();
     }
 
     private void Update()
@@ -112,8 +129,11 @@ public class MatchManager : MonoBehaviour
     if (BlueCountdownText != null) BlueCountdownText.text = "GO!";
 
 
-        Time.timeScale = 1f;
+    Time.timeScale = 1f;
     matchRunning = true;
+
+    if (BackgroundMusic.Instance != null)
+        BackgroundMusic.Instance.PlayBattle();
 
     yield return new WaitForSeconds(1f);
     if (RedCountdownText != null) RedCountdownText.text = "";
@@ -125,6 +145,21 @@ public class MatchManager : MonoBehaviour
         Time.timeScale = 0f;
         if (RedCountdownText != null) RedCountdownText.text = "TIME!";
         if (BlueCountdownText != null) BlueCountdownText.text = "TIME!";
+
+        if (BackgroundMusic.Instance != null)
+            BackgroundMusic.Instance.PlayEnd();
+
+        if (gameManager != null)
+        {
+            if (gameManager.redTeamScore > gameManager.blueTeamScore)
+            {
+                if (RedWinOverlay != null) RedWinOverlay.SetActive(true);
+            }
+            else if (gameManager.blueTeamScore > gameManager.redTeamScore)
+            {
+                if (BlueWinOverlay != null) BlueWinOverlay.SetActive(true);
+            }
+        }
 
         yield return new WaitForSecondsRealtime(15f);
 

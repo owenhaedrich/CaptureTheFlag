@@ -4,8 +4,8 @@ public class GameManager : MonoBehaviour
 {
     [SerializeField] public UIManager UI;
 
-    int redTeamScore = 0;
-    int blueTeamScore = 0;
+    public int redTeamScore { get; private set; } = 0;
+    public int blueTeamScore { get; private set; } = 0;
 
     private void Start()
     {

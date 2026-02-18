@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 using System.Collections;
 
 public enum Team { Red, Blue };
@@ -35,8 +36,12 @@ public class PlayerController : MonoBehaviour
     PlayerInput PlayerInput;
     InputAction InputActionMove;
     InputAction InputActionBoost;
+    InputAction InputActionStart;
 
     bool IsDead = false;
+
+    float startButtonHoldTimer = 0f;
+    const float RELOAD_HOLD_TIME = 5.0f;
 
     private void Awake()
     {
@@ -66,6 +71,7 @@ public class PlayerController : MonoBehaviour
         PlayerInput = playerInput;
         InputActionMove = playerInput.actions.FindAction("Player/Move");
         InputActionBoost = playerInput.actions.FindAction("Player/Jump");
+        InputActionStart = playerInput.actions.FindAction("Player/Start");
     }
 
     public void AssignPlayerNumber(int playerNumber)
@@ -153,6 +159,27 @@ public class PlayerController : MonoBehaviour
             if (InputActionBoost != null && InputActionBoost.WasPressedThisFrame())
                 DoBoost = true;
         }
+
+        HandleReloadButton();
+    }
+
+    private void HandleReloadButton()
+    {
+        if (InputActionStart == null) return;
+
+        if (InputActionStart.IsPressed())
+        {
+            startButtonHoldTimer += Time.deltaTime;
+            if (startButtonHoldTimer >= RELOAD_HOLD_TIME)
+            {
+                startButtonHoldTimer = 0f; // Reset to avoid multiple triggers if scene doesn't load instantly
+                SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+            }
+        }
+        else
+        {
+            startButtonHoldTimer = 0f;
+        }
     }
 
     void FixedUpdate()
@@ -175,6 +202,9 @@ public class PlayerController : MonoBehaviour
             Rigidbody2D.AddForce(BoostForce * moveValue, ForceMode2D.Impulse);
             DoBoost = false;
             BoostCooldownTimer = BoostCooldown;
+
+            if (SoundManager.Instance != null)
+                SoundManager.Instance.PlayDash();
         }
 
         // Check if we are in the boost attack window (after boosting but before cooldown finishes)
@@ -193,7 +223,11 @@ public class PlayerController : MonoBehaviour
 
         // Kill the other player if they are in the enemy end or carrying a flag, AND they are not boosting themselves (boosts trade)
         if ((otherPlayer.IsInEnemyEnd() || otherPlayer.CarriedFlag != null) && !otherPlayer.inBoostWindow)
+        {
             otherPlayer.Die();
+            if (SoundManager.Instance != null)
+                SoundManager.Instance.PlayDashKill();
+        }
     }
 
     private void OnValidate()

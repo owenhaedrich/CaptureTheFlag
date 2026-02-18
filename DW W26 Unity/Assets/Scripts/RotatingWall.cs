@@ -30,6 +30,6 @@ public class RotatingWall : Activatable
     private void FixedUpdate()
     {
         float speed = active ? -rotateSpeed : rotateSpeed;
-        WallRigidBody.AddTorque(speed);
+        WallRigidBody.angularVelocity = speed;
     }
 }
